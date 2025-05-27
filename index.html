@@ -1,156 +1,73 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Admin Futuristik</title>
-  <link rel="icon" href="https://img001.prntscr.com/file/img001/2VxamRT3TDyw_8N3gxJ2OA.png" type="image/jpg">
+  <link rel="icon" href="https://img001.prntscr.com/file/img001/2VxamRT3TDyw_8N3gxJ2OA.png" type="image/jpg" />
   <style>
-    /* Style yang sudah ada sebelumnya */
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-      color: white; overflow: hidden;
-    }
-    .trail {
-      position: fixed;
-      width: 8px; height: 8px;
-      background: #00ffe0;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9999;
-      box-shadow: 0 0 15px #00ffe0;
-    }
-    .login-container {
-      display: flex; justify-content: center; align-items: center;
-      height: 100vh; position: relative;
-    }
-    .login-box {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      padding: 40px; border-radius: 20px;
-      box-shadow: 0 0 20px rgba(0,255,255,0.2);
-      width: 100%; max-width: 400px;
-    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(to right, #0f2027, #203a43, #2c5364); color: white; overflow: hidden; min-height: 100vh; display: flex; flex-direction: column; }
+    .trail { position: fixed; width: 8px; height: 8px; background: #00ffe0; border-radius: 50%; pointer-events: none; z-index: 9999; box-shadow: 0 0 15px #00ffe0; }
+    .login-container { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; padding: 20px; }
+    .login-box { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 40px; border-radius: 20px; box-shadow: 0 0 20px rgba(0, 255, 255, 0.2); width: 100%; max-width: 400px; }
     .login-box h2 { text-align: center; margin-bottom: 30px; font-size: 26px; }
-    .login-box input {
-      width: 100%; padding: 12px; margin: 10px 0;
-      border: none; border-radius: 8px; font-size: 16px;
-      background: rgba(255,255,255,0.1); color: white;
-    }
+    .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: none; border-radius: 8px; font-size: 16px; background: rgba(255, 255, 255, 0.1); color: white; }
     .login-box input::placeholder { color: #ccc; }
-    .login-box button {
-      width: 100%; padding: 12px; margin-top: 20px;
-      border: none; border-radius: 8px;
-      background: linear-gradient(135deg, #00ffc3, #007cff);
-      color: #000; font-size: 18px; font-weight: bold;
-      cursor: pointer; transition: all 0.3s ease;
-    }
-    .login-box button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 15px #00ffc3;
-    }
-    .error-message {
-      text-align: center; color: #ff6b6b; margin-top: 10px;
-    }
-
-    /* Loading Animation */
-    .loading-container {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 999;
-      justify-content: center;
-      align-items: center;
-    }
-    .loading-spinner {
-      border: 10px solid rgba(255, 255, 255, 0.1);
-      border-top: 10px solid #00ffc3;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      animation: spin 1.5s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .dashboard {
-      display: none; height: 100vh; background: #10161d; flex-direction: row;
-    }
-    .sidebar {
-      width: 260px; background: #0b121a;
-      border-right: 2px solid #00ffc3; padding: 20px;
-    }
-    .sidebar ul { list-style: none; }
+    .login-box button[type="submit"] { width: 100%; padding: 12px; margin-top: 20px; border: none; border-radius: 8px; background: linear-gradient(135deg, #00ffc3, #007cff); color: #000; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; }
+    .login-box button[type="submit"]:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 0 15px #00ffc3; }
+    .login-box button[type="submit"]:disabled { cursor: not-allowed; opacity: 0.6; box-shadow: none; transform: none; }
+    .error-message { text-align: center; color: #ff6b6b; margin-top: 10px; min-height: 22px; }
+    .loading-container { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 999; justify-content: center; align-items: center; }
+    .loading-spinner { border: 10px solid rgba(255, 255, 255, 0.1); border-top: 10px solid #00ffc3; border-radius: 50%; width: 50px; height: 50px; animation: spin 1.5s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .dashboard { display: none; height: 100vh; background: #10161d; flex-direction: row; flex: 1; overflow: hidden; }
+    .sidebar { width: 260px; background: #0b121a; border-right: 2px solid #00ffc3; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; }
+    .sidebar ul { list-style: none; padding: 0; margin: 0; }
     .sidebar ul li { margin-bottom: 20px; }
-    .sidebar ul li a {
-      color: #fff; text-decoration: none; font-size: 18px;
-      display: block; padding: 10px;
-      border-radius: 10px; transition: background 0.3s;
-    }
-    .sidebar ul li a:hover {
-      background: #00ffc3; color: #000;
-    }
-    .sidebar button {
-      margin-top: 30px; width: 100%; padding: 12px;
-      background: #ff4d4d; border: none; color: #fff;
-      font-weight: bold; border-radius: 10px; cursor: pointer;
-    }
-    .content {
-      flex: 1; padding: 30px; color: #ccc;
-    }
+    .sidebar ul li a { color: #fff; text-decoration: none; font-size: 18px; display: block; padding: 10px; border-radius: 10px; transition: background 0.3s; }
+    .sidebar ul li a:hover { background: #00ffc3; color: #000; }
+    .sidebar button { margin-top: 30px; width: 100%; padding: 12px; background: #ff4d4d; border: none; color: #fff; font-weight: bold; border-radius: 10px; cursor: pointer; transition: background 0.3s ease; }
+    .sidebar button:hover { background: #ff1a1a; }
+    .content { flex: 1; padding: 30px; color: #ccc; overflow-y: auto; }
     .content h1 { font-size: 30px; margin-bottom: 10px; }
     .content p { font-size: 18px; }
-
-    /* Session Timeout Message */
-    .session-timeout {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(255, 0, 0, 0.8);
-      color: white;
-      padding: 20px;
-      border-radius: 10px;
-      font-size: 20px;
-    }
-    @media (max-width: 768px) {
-      .sidebar { display: none; }
-    }
+    .session-timeout, #session-warning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255, 0, 0, 0.8); color: white; padding: 20px; border-radius: 10px; font-size: 20px; z-index: 10000; display: none; max-width: 90vw; text-align: center; }
+    #session-warning { background: orange; color: black; }
+    #session-warning button { margin-top: 15px; padding: 10px 20px; font-weight: bold; font-size: 16px; background: #007cff; border: none; color: white; border-radius: 8px; cursor: pointer; transition: background 0.3s ease; }
+    #session-warning button:hover { background: #005bb5; }
+    .toggle-password-container { text-align: right; margin-top: -10px; margin-bottom: 10px; }
+    .toggle-password-container button { background: none; color: #ccc; border: none; font-size: 14px; cursor: pointer; padding: 0; user-select: none; }
+    .captcha-container { margin-top: 15px; }
+    .captcha-question { font-weight: bold; margin-bottom: 8px; user-select: none; font-size: 16px; }
+    .captcha-input { width: 100%; padding: 12px; border-radius: 8px; border: none; font-size: 16px; background: rgba(255, 255, 255, 0.1); color: white; }
+    @media (max-width: 768px) { .sidebar { display: none; } .dashboard { flex-direction: column; } }
   </style>
 </head>
 <body>
   <div class="trail" id="trail"></div>
-
   <div class="login-container" id="login-container">
     <div class="login-box">
       <h2>Login Admin</h2>
-      <form id="login-form">
-        <input type="text" id="username" placeholder="Username" required>
-        <input type="password" id="password" placeholder="Password" required>
-        <button type="submit">Login</button>
+      <form id="login-form" autocomplete="off" novalidate>
+        <input type="text" id="username" placeholder="Username" required minlength="4" />
+        <input type="password" id="password" placeholder="Password" required minlength="6" />
+        <div class="toggle-password-container">
+          <button type="button" id="toggle-password-btn">👁️ Lihat Password</button>
+        </div>
+        <div class="captcha-container">
+          <div class="captcha-question" id="captcha-question">Memuat Captcha...</div>
+          <input type="text" id="captcha-input" placeholder="Tulis angka di atas" required pattern="[0-9]{4}" class="captcha-input" autocomplete="off" />
+        </div>
+        <button type="submit" id="login-button">Login</button>
         <p class="error-message" id="login-error"></p>
       </form>
     </div>
   </div>
 
-  <!-- Loading Animation -->
-  <div class="loading-container" id="loading-container">
-    <div class="loading-spinner"></div>
-  </div>
-
-  <!-- Session Timeout Message -->
-  <div class="session-timeout" id="session-timeout">
-    Sesi Anda telah berakhir. Silakan refres & login kembali.
-  </div>
+  <div class="loading-container" id="loading-container"><div class="loading-spinner"></div></div>
+  <div class="session-timeout" id="session-timeout">Sesi Anda telah berakhir. Silakan login kembali...</div>
+  <div id="session-warning">🔔 Sesi akan habis dalam 60 detik!<br /><br /><button onclick="extendSession()">Perpanjang Sesi</button></div>
 
   <div class="dashboard" id="dashboard">
     <div class="sidebar">
@@ -160,7 +77,7 @@
         <li><a href="https://abang-cs.github.io/pkv/" target="_blank">CATATAN PKV ↗</a></li>
         <li><a href="https://abang-cs.github.io/togel/" target="_blank">CATATAN TOGEL ↗</a></li>
         <li><a href="https://0fj.cc/casino" target="_blank">CATATAN CASINO ↗</a></li>
-		<li><a href="https://pc.ct-999.com/" target="_blank">ID TEST CASINO ↗</a></li>
+        <li><a href="https://pc.ct-999.com/" target="_blank">ID TEST CASINO ↗</a></li>
         <li><a href="https://abang-cs.github.io/rumus/" target="_blank">RUMUS PARLAY ↗</a></li>
       </ul>
       <button id="logout-btn">Logout</button>
@@ -174,79 +91,168 @@
   <script>
     const form = document.getElementById("login-form");
     const errorMessage = document.getElementById("login-error");
+    const loadingContainer = document.getElementById("loading-container");
+    const loginContainer = document.getElementById("login-container");
+    const dashboard = document.getElementById("dashboard");
+    const logoutBtn = document.getElementById("logout-btn");
+    const sessionTimeoutMsg = document.getElementById("session-timeout");
+    const sessionWarning = document.getElementById("session-warning");
+    const loginBtn = document.getElementById("login-button");
+    const captchaQuestionEl = document.getElementById("captcha-question");
+    const captchaInput = document.getElementById("captcha-input");
+    const togglePasswordBtn = document.getElementById("toggle-password-btn");
+    const usernameInput = document.getElementById("username");
+    const passwordInput = document.getElementById("password");
 
-    // Mouse trail
-    const trail = document.getElementById("trail");
-    document.addEventListener("mousemove", (e) => {
-      trail.style.left = e.pageX + 'px';
-      trail.style.top = e.pageY + 'px';
-    });
+    const salt = "x@168AND365";
+    const storedHash = "4bbef81ef369d37746faf9aed65e0219375796825bab86e781830da321e1d3cc"; // SHA-256(admin:qq010101 + salt)
 
-    // Encode base64
-    function encodeBase64(str) {
-      return btoa(unescape(encodeURIComponent(str)));
+    const SESSION_TIMEOUT = 5 * 60 * 1000;
+    const SESSION_WARNING_TIME = 60 * 1000;
+    let sessionTimer, sessionWarningTimer;
+    const MAX_ATTEMPTS = 5;
+    let attempts = 0;
+    let captchaAnswer = "";
+
+    async function hashWithSalt(data, salt) {
+      const encoder = new TextEncoder();
+      const input = encoder.encode(data + salt);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", input);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
     }
 
-    // Disamarkan
-    const storedHash = "YWRtaW46cXEwMTAxMDE="; 
-
-    // Timeout session (5 menit)
-    const SESSION_TIMEOUT = 5 * 60 * 1000; // 5 menit
-    let sessionTimer;
+    function generateCaptcha() {
+      captchaAnswer = "";
+      for (let i = 0; i < 4; i++) captchaAnswer += Math.floor(Math.random() * 10);
+      captchaQuestionEl.textContent = "Captcha: " + captchaAnswer;
+      captchaInput.value = "";
+    }
 
     function resetSessionTimer() {
       clearTimeout(sessionTimer);
-      sessionTimer = setTimeout(() => {
-        document.getElementById("session-timeout").style.display = "block";
-        document.getElementById("dashboard").style.display = "none";
-        localStorage.removeItem('isLoggedIn'); // Clear session from localStorage
-      }, SESSION_TIMEOUT);
+      clearTimeout(sessionWarningTimer);
+      sessionWarning.style.display = "none";
+      sessionWarningTimer = setTimeout(() => sessionWarning.style.display = "block", SESSION_TIMEOUT - SESSION_WARNING_TIME);
+      sessionTimer = setTimeout(() => logoutDueSessionTimeout(), SESSION_TIMEOUT);
     }
 
-    // Cek status login dari localStorage saat halaman dimuat
-    window.onload = function() {
-      if (localStorage.getItem('isLoggedIn') === 'true') {
-        document.getElementById("login-container").style.display = "none";
-        document.getElementById("dashboard").style.display = "flex";
-        resetSessionTimer(); // Reset session timer jika login
+    function extendSession() {
+      resetSessionTimer();
+      sessionWarning.style.display = "none";
+    }
+
+    function logoutDueSessionTimeout() {
+      localStorage.removeItem("isLoggedIn");
+      clearTimeout(sessionTimer);
+      clearTimeout(sessionWarningTimer);
+      attempts = 0;
+      dashboard.style.display = "none";
+      loginContainer.style.display = "flex";
+      form.reset();
+      generateCaptcha();
+      errorMessage.textContent = "";
+      loginBtn.disabled = false;
+      sessionTimeoutMsg.style.display = "block";
+      setTimeout(() => {
+        sessionTimeoutMsg.style.display = "none";
+        window.location.reload();
+      }, 5000);
+    }
+
+    window.onload = function () {
+      generateCaptcha();
+      if (localStorage.getItem("isLoggedIn") === "true") {
+        loginContainer.style.display = "none";
+        dashboard.style.display = "flex";
+        resetSessionTimer();
       }
-    }
+    };
 
-    form.addEventListener("submit", function(e) {
+    togglePasswordBtn.addEventListener("click", () => {
+      const isHidden = passwordInput.type === "password";
+      passwordInput.type = isHidden ? "text" : "password";
+      togglePasswordBtn.textContent = isHidden ? "🙈 Sembunyikan Password" : "👁️ Lihat Password";
+    });
+
+    form.addEventListener("submit", async function (e) {
       e.preventDefault();
       errorMessage.textContent = "";
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const check = encodeBase64(username + ":" + password);
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value.trim();
+      const captchaValue = captchaInput.value.trim();
 
-      // Show loading animation
-      document.getElementById("loading-container").style.display = "flex";
+      if (username.length < 4 || password.length < 6) {
+        errorMessage.textContent = "Username dan password minimal harus sesuai.";
+        return;
+      }
+      if (captchaValue !== captchaAnswer) {
+        errorMessage.textContent = "Captcha salah, coba lagi.";
+        generateCaptcha();
+        return;
+      }
 
-      setTimeout(function() {
-        if (check === storedHash) {
-          localStorage.setItem('isLoggedIn', 'true'); // Simpan status login
-          document.getElementById("login-container").style.display = "none";
-          document.getElementById("dashboard").style.display = "flex";
-          resetSessionTimer(); // Start session timer
+      if (attempts >= MAX_ATTEMPTS) {
+        errorMessage.textContent = "Anda sudah 5x gagal login. Tunggu 1 menit.";
+        loginBtn.disabled = true;
+        setTimeout(() => {
+          attempts = 0;
+          loginBtn.disabled = false;
+          errorMessage.textContent = "";
+          generateCaptcha();
+        }, 60000);
+        return;
+      }
+
+      loadingContainer.style.display = "flex";
+      loginBtn.disabled = true;
+
+      const combined = username + ":" + password;
+      const inputHash = await hashWithSalt(combined, salt);
+
+      setTimeout(() => {
+        if (inputHash === storedHash) {
+          localStorage.setItem("isLoggedIn", "true");
+          loginContainer.style.display = "none";
+          dashboard.style.display = "flex";
+          resetSessionTimer();
+          attempts = 0;
+          form.reset();
+          generateCaptcha();
         } else {
-          errorMessage.textContent = "Username atau password salah.";
+          attempts++;
+          errorMessage.textContent = `Username atau password salah. Percobaan ke-${attempts} dari ${MAX_ATTEMPTS}.`;
+          generateCaptcha();
         }
-        // Hide loading animation after the check
-        document.getElementById("loading-container").style.display = "none";
-      }, 1500); // Simulate loading time (1.5 seconds)
+        loadingContainer.style.display = "none";
+        loginBtn.disabled = false;
+      }, 1500);
     });
 
-    document.getElementById("logout-btn").addEventListener("click", function() {
-      localStorage.removeItem('isLoggedIn'); // Hapus status login saat logout
-      document.getElementById("dashboard").style.display = "none";
-      document.getElementById("login-container").style.display = "flex";
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("isLoggedIn");
+      dashboard.style.display = "none";
+      loginContainer.style.display = "flex";
       form.reset();
-      clearTimeout(sessionTimer); // Clear session timer on logout
+      errorMessage.textContent = "";
+      clearTimeout(sessionTimer);
+      clearTimeout(sessionWarningTimer);
+      attempts = 0;
+      generateCaptcha();
+      loginBtn.disabled = false;
     });
 
-    // Reset session if user interacts with the page
-    document.addEventListener("mousemove", resetSessionTimer);
-    document.addEventListener("keypress", resetSessionTimer);
+    function userActivity() {
+      if (localStorage.getItem("isLoggedIn") === "true") resetSessionTimer();
+    }
+    document.addEventListener("mousemove", userActivity);
+    document.addEventListener("keypress", userActivity);
+
+    const trail = document.getElementById("trail");
+    document.addEventListener("mousemove", (e) => {
+      trail.style.left = e.pageX + "px";
+      trail.style.top = e.pageY + "px";
+    });
   </script>
 </body>
 </html>
