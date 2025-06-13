@@ -72,14 +72,13 @@
   <div class="dashboard" id="dashboard">
     <div class="sidebar">
       <ul>
-        <li><a href="#">DASHBOARD</a></li>
-        <li><a href="https://abang-cs.github.io/bola/" target="_blank">CATATAN SPORTBOOK ↗</a></li>
-        <li><a href="https://abang-cs.github.io/pkv/" target="_blank">CATATAN PKV ↗</a></li>
-        <li><a href="https://abang-cs.github.io/togel/" target="_blank">CATATAN TOGEL ↗</a></li>
-        <li><a href="https://0fj.cc/casino" target="_blank">CATATAN CASINO ↗</a></li>
-        <li><a href="https://pc.ct-999.com/" target="_blank">ID TEST CASINO ↗</a></li>
-        <li><a href="https://abang-cs.github.io/rumus/" target="_blank">RUMUS PARLAY ↗</a></li>
-      </ul>
+  <li><a href="https://abang-cs.github.io/bola/" class="popup-link">CATATAN SPORTBOOK ↗</a></li>
+  <li><a href="https://abang-cs.github.io/pkv/" class="popup-link">CATATAN PKV ↗</a></li>
+  <li><a href="https://abang-cs.github.io/togel/" class="popup-link">CATATAN TOGEL ↗</a></li>
+  <li><a href="https://0fj.cc/casino" class="popup-link">CATATAN CASINO ↗</a></li>
+  <li><a href="https://pc.ct-999.com/" class="popup-link">ID TEST CASINO ↗</a></li>
+  <li><a href="https://abang-cs.github.io/rumus/" class="popup-link">RUMUS PARLAY ↗</a></li>
+</ul>
       <button id="logout-btn">Logout</button>
     </div>
     <div class="content">
@@ -253,6 +252,15 @@
       trail.style.left = e.pageX + "px";
       trail.style.top = e.pageY + "px";
     });
+	
+	// Buka semua link dengan class "popup-link" di jendela baru (popup window)
+document.querySelectorAll('.popup-link').forEach(link => {
+  link.addEventListener('click', function(e) {
+    e.preventDefault();
+    window.open(this.href, '_blank', 'width=1000,height=700,scrollbars=yes,resizable=yes');
+  });
+});
+
   </script>
 </body>
 </html>
