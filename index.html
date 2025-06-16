@@ -41,10 +41,116 @@
     .captcha-container { margin-top: 15px; }
     .captcha-question { font-weight: bold; margin-bottom: 8px; user-select: none; font-size: 16px; }
     .captcha-input { width: 100%; padding: 12px; border-radius: 8px; border: none; font-size: 16px; background: rgba(255, 255, 255, 0.1); color: white; }
-    @media (max-width: 768px) { .sidebar { display: none; } .dashboard { flex-direction: column; } }
+    
+    /* New Loading Screen Styles */
+    .initial-loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0f2027;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.5s ease-out;
+    }
+    .initial-loading-screen.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .loading-logo {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 30px;
+      background: url('https://img001.prntscr.com/file/img001/2VxamRT3TDyw_8N3gxJ2OA.png') center/contain no-repeat;
+      filter: drop-shadow(0 0 10px rgba(0, 255, 195, 0.7));
+      animation: pulse 2s infinite;
+    }
+    .loading-progress {
+      width: 80%;
+      max-width: 300px;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .loading-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #00ffc3, #007cff);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+    .loading-text {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #00ffc3;
+      text-align: center;
+      text-shadow: 0 0 10px rgba(0, 255, 195, 0.5);
+    }
+    .loading-dots {
+      display: inline-block;
+      width: 20px;
+      text-align: left;
+    }
+    
+    /* New Animations */
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    /* New Hover Effects */
+    .login-box input:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(0, 255, 195, 0.3);
+    }
+    
+    /* Page Transition Effect */
+    .page-transition {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0f2027;
+      z-index: 9998;
+      transform: scaleY(0);
+      transform-origin: bottom;
+      transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+    
+    /* Responsive Styles */
+    @media (max-width: 768px) { 
+      .sidebar { display: none; } 
+      .dashboard { flex-direction: column; } 
+      .login-box { padding: 30px 20px; }
+    }
   </style>
 </head>
 <body>
+  <!-- Initial Loading Screen -->
+  <div class="initial-loading-screen" id="initialLoadingScreen">
+    <div class="loading-logo"></div>
+    <div class="loading-progress">
+      <div class="loading-progress-bar" id="loadingProgressBar"></div>
+    </div>
+    <div class="loading-text">Memuat sistem<span class="loading-dots" id="loadingDots"></span></div>
+  </div>
+  
+  <!-- Page Transition Effect -->
+  <div class="page-transition" id="pageTransition"></div>
+  
   <div class="trail" id="trail"></div>
   <div class="login-container" id="login-container">
     <div class="login-box">
@@ -72,13 +178,13 @@
   <div class="dashboard" id="dashboard">
     <div class="sidebar">
       <ul>
-  <li><a href="https://abang-cs.github.io/bola/" class="popup-link">CATATAN SPORTBOOK ↗</a></li>
-  <li><a href="https://abang-cs.github.io/pkv/" class="popup-link">CATATAN PKV ↗</a></li>
-  <li><a href="https://abang-cs.github.io/togel/" class="popup-link">CATATAN TOGEL ↗</a></li>
-  <li><a href="https://0fj.cc/casino" class="popup-link">CATATAN CASINO ↗</a></li>
-  <li><a href="https://pc.ct-999.com/" class="popup-link">ID TEST CASINO ↗</a></li>
-  <li><a href="https://abang-cs.github.io/rumus/" class="popup-link">RUMUS PARLAY ↗</a></li>
-</ul>
+        <li><a href="https://abang-cs.github.io/bola/" class="popup-link">CATATAN SPORTBOOK ↗</a></li>
+        <li><a href="https://abang-cs.github.io/pkv/" class="popup-link">CATATAN PKV ↗</a></li>
+        <li><a href="https://abang-cs.github.io/togel/" class="popup-link">CATATAN TOGEL ↗</a></li>
+        <li><a href="https://0fj.cc/casino" class="popup-link">CATATAN CASINO ↗</a></li>
+        <li><a href="https://pc.ct-999.com/" class="popup-link">ID TEST CASINO ↗</a></li>
+        <li><a href="https://abang-cs.github.io/rumus/" class="popup-link">RUMUS PARLAY ↗</a></li>
+      </ul>
       <button id="logout-btn">Logout</button>
     </div>
     <div class="content">
@@ -88,6 +194,35 @@
   </div>
 
   <script>
+    // Initial Loading Screen Animation
+    document.addEventListener('DOMContentLoaded', function() {
+      const loadingScreen = document.getElementById('initialLoadingScreen');
+      const progressBar = document.getElementById('loadingProgressBar');
+      const loadingDots = document.getElementById('loadingDots');
+      
+      // Simulate loading progress
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += Math.random() * 10;
+        if (progress > 100) progress = 100;
+        progressBar.style.width = `${progress}%`;
+        
+        // Animate dots
+        const dots = '.'.repeat(Math.floor((progress / 100) * 3));
+        loadingDots.textContent = dots;
+        
+        if (progress >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            loadingScreen.classList.add('hide');
+            setTimeout(() => {
+              loadingScreen.style.display = 'none';
+            }, 500);
+          }, 500);
+        }
+      }, 100);
+    });
+
     const form = document.getElementById("login-form");
     const errorMessage = document.getElementById("login-error");
     const loadingContainer = document.getElementById("loading-container");
@@ -102,11 +237,12 @@
     const togglePasswordBtn = document.getElementById("toggle-password-btn");
     const usernameInput = document.getElementById("username");
     const passwordInput = document.getElementById("password");
+    const pageTransition = document.getElementById("pageTransition");
 
     const salt = "x@168AND365";
     const storedHash = "4bbef81ef369d37746faf9aed65e0219375796825bab86e781830da321e1d3cc"; 
 
-    const SESSION_TIMEOUT = 5 * 60 * 1000;
+    const SESSION_TIMEOUT = 0.5 * 60 * 1000;
     const SESSION_WARNING_TIME = 60 * 1000;
     let sessionTimer, sessionWarningTimer;
     const MAX_ATTEMPTS = 5;
@@ -146,17 +282,30 @@
       clearTimeout(sessionTimer);
       clearTimeout(sessionWarningTimer);
       attempts = 0;
-      dashboard.style.display = "none";
-      loginContainer.style.display = "flex";
-      form.reset();
-      generateCaptcha();
-      errorMessage.textContent = "";
-      loginBtn.disabled = false;
-      sessionTimeoutMsg.style.display = "block";
+      
+      // Add page transition effect
+      pageTransition.style.transform = "scaleY(1)";
+      pageTransition.style.transformOrigin = "top";
+      
       setTimeout(() => {
-        sessionTimeoutMsg.style.display = "none";
-        window.location.reload();
-      }, 5000);
+        dashboard.style.display = "none";
+        loginContainer.style.display = "flex";
+        form.reset();
+        generateCaptcha();
+        errorMessage.textContent = "";
+        loginBtn.disabled = false;
+        sessionTimeoutMsg.style.display = "block";
+        
+        // Reverse the transition
+        setTimeout(() => {
+          pageTransition.style.transform = "scaleY(0)";
+          pageTransition.style.transformOrigin = "bottom";
+        }, 50);
+        
+        setTimeout(() => {
+          sessionTimeoutMsg.style.display = "none";
+        }, 5000);
+      }, 600);
     }
 
     window.onload = function () {
@@ -211,17 +360,35 @@
 
       setTimeout(() => {
         if (inputHash === storedHash) {
-          localStorage.setItem("isLoggedIn", "true");
-          loginContainer.style.display = "none";
-          dashboard.style.display = "flex";
-          resetSessionTimer();
-          attempts = 0;
-          form.reset();
-          generateCaptcha();
+          // Add page transition effect
+          pageTransition.style.transform = "scaleY(1)";
+          pageTransition.style.transformOrigin = "bottom";
+          
+          setTimeout(() => {
+            localStorage.setItem("isLoggedIn", "true");
+            loginContainer.style.display = "none";
+            dashboard.style.display = "flex";
+            resetSessionTimer();
+            attempts = 0;
+            form.reset();
+            generateCaptcha();
+            
+            // Reverse the transition
+            setTimeout(() => {
+              pageTransition.style.transform = "scaleY(0)";
+              pageTransition.style.transformOrigin = "top";
+            }, 50);
+          }, 600);
         } else {
           attempts++;
           errorMessage.textContent = `Username atau password salah. Percobaan ke-${attempts} dari ${MAX_ATTEMPTS}.`;
           generateCaptcha();
+          
+          // Shake animation for error
+          loginContainer.style.animation = "shake 0.5s";
+          setTimeout(() => {
+            loginContainer.style.animation = "";
+          }, 500);
         }
         loadingContainer.style.display = "none";
         loginBtn.disabled = false;
@@ -229,16 +396,28 @@
     });
 
     logoutBtn.addEventListener("click", () => {
-      localStorage.removeItem("isLoggedIn");
-      dashboard.style.display = "none";
-      loginContainer.style.display = "flex";
-      form.reset();
-      errorMessage.textContent = "";
-      clearTimeout(sessionTimer);
-      clearTimeout(sessionWarningTimer);
-      attempts = 0;
-      generateCaptcha();
-      loginBtn.disabled = false;
+      // Add page transition effect
+      pageTransition.style.transform = "scaleY(1)";
+      pageTransition.style.transformOrigin = "top";
+      
+      setTimeout(() => {
+        localStorage.removeItem("isLoggedIn");
+        dashboard.style.display = "none";
+        loginContainer.style.display = "flex";
+        form.reset();
+        errorMessage.textContent = "";
+        clearTimeout(sessionTimer);
+        clearTimeout(sessionWarningTimer);
+        attempts = 0;
+        generateCaptcha();
+        loginBtn.disabled = false;
+        
+        // Reverse the transition
+        setTimeout(() => {
+          pageTransition.style.transform = "scaleY(0)";
+          pageTransition.style.transformOrigin = "bottom";
+        }, 50);
+      }, 600);
     });
 
     function userActivity() {
@@ -252,15 +431,26 @@
       trail.style.left = e.pageX + "px";
       trail.style.top = e.pageY + "px";
     });
-	
-	// Buka semua link dengan class "popup-link" di jendela baru (popup window)
-document.querySelectorAll('.popup-link').forEach(link => {
-  link.addEventListener('click', function(e) {
-    e.preventDefault();
-    window.open(this.href, '_blank', 'width=1000,height=700,scrollbars=yes,resizable=yes');
-  });
-});
+    
+    // Buka semua link dengan class "popup-link" di jendela baru (popup window)
+    document.querySelectorAll('.popup-link').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.open(this.href, '_blank', 'width=1000,height=700,scrollbars=yes,resizable=yes');
+      });
+    });
 
+    // Add shake animation for errors
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+      }
+    `;
+    document.head.appendChild(style);
   </script>
 </body>
 </html>
+
