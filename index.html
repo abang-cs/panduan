@@ -172,8 +172,7 @@
   </div>
 
   <div class="loading-container" id="loading-container"><div class="loading-spinner"></div></div>
-  <div class="session-timeout" id="session-timeout">Sesi Anda telah berakhir. Silakan login kembali...</div>
-  <div id="session-warning">🔔 Sesi akan habis dalam 60 detik!<br /><br /><button onclick="extendSession()">Perpanjang Sesi</button></div>
+ 
 
   <div class="dashboard" id="dashboard">
     <div class="sidebar">
@@ -194,263 +193,239 @@
   </div>
 
   <script>
-    // Initial Loading Screen Animation
-    document.addEventListener('DOMContentLoaded', function() {
-      const loadingScreen = document.getElementById('initialLoadingScreen');
-      const progressBar = document.getElementById('loadingProgressBar');
-      const loadingDots = document.getElementById('loadingDots');
-      
-      // Simulate loading progress
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += Math.random() * 10;
-        if (progress > 100) progress = 100;
-        progressBar.style.width = `${progress}%`;
-        
-        // Animate dots
-        const dots = '.'.repeat(Math.floor((progress / 100) * 3));
-        loadingDots.textContent = dots;
-        
-        if (progress >= 100) {
-          clearInterval(interval);
-          setTimeout(() => {
-            loadingScreen.classList.add('hide');
-            setTimeout(() => {
-              loadingScreen.style.display = 'none';
-            }, 500);
-          }, 500);
-        }
-      }, 100);
-    });
-
-    const form = document.getElementById("login-form");
-    const errorMessage = document.getElementById("login-error");
-    const loadingContainer = document.getElementById("loading-container");
-    const loginContainer = document.getElementById("login-container");
-    const dashboard = document.getElementById("dashboard");
-    const logoutBtn = document.getElementById("logout-btn");
-    const sessionTimeoutMsg = document.getElementById("session-timeout");
-    const sessionWarning = document.getElementById("session-warning");
-    const loginBtn = document.getElementById("login-button");
-    const captchaQuestionEl = document.getElementById("captcha-question");
-    const captchaInput = document.getElementById("captcha-input");
-    const togglePasswordBtn = document.getElementById("toggle-password-btn");
-    const usernameInput = document.getElementById("username");
-    const passwordInput = document.getElementById("password");
-    const pageTransition = document.getElementById("pageTransition");
-
-    const salt = "x@168AND365";
-    const storedHash = "4bbef81ef369d37746faf9aed65e0219375796825bab86e781830da321e1d3cc"; 
-
-    const SESSION_TIMEOUT = 10 * 60 * 1000;
-    const SESSION_WARNING_TIME = 60 * 1000;
-    let sessionTimer, sessionWarningTimer;
-    const MAX_ATTEMPTS = 5;
-    let attempts = 0;
-    let captchaAnswer = "";
-
-    async function hashWithSalt(data, salt) {
-      const encoder = new TextEncoder();
-      const input = encoder.encode(data + salt);
-      const hashBuffer = await crypto.subtle.digest("SHA-256", input);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-    }
-
-    function generateCaptcha() {
-      captchaAnswer = "";
-      for (let i = 0; i < 4; i++) captchaAnswer += Math.floor(Math.random() * 10);
-      captchaQuestionEl.textContent = "Captcha: " + captchaAnswer;
-      captchaInput.value = "";
-    }
-
-    function resetSessionTimer() {
-      clearTimeout(sessionTimer);
-      clearTimeout(sessionWarningTimer);
-      sessionWarning.style.display = "none";
-      sessionWarningTimer = setTimeout(() => sessionWarning.style.display = "block", SESSION_TIMEOUT - SESSION_WARNING_TIME);
-      sessionTimer = setTimeout(() => logoutDueSessionTimeout(), SESSION_TIMEOUT);
-    }
-
-    function extendSession() {
-      resetSessionTimer();
-      sessionWarning.style.display = "none";
-    }
-
-    function logoutDueSessionTimeout() {
-      localStorage.removeItem("isLoggedIn");
-      clearTimeout(sessionTimer);
-      clearTimeout(sessionWarningTimer);
-      attempts = 0;
-      
-      // Add page transition effect
-      pageTransition.style.transform = "scaleY(1)";
-      pageTransition.style.transformOrigin = "top";
-      
+  document.addEventListener('DOMContentLoaded', function () {
+  const loadingScreen = document.getElementById('initialLoadingScreen');
+  const progressBar = document.getElementById('loadingProgressBar');
+  const loadingDots = document.getElementById('loadingDots');
+  let progress = 0;
+  const interval = setInterval(() => {
+    progress += Math.random() * 10;
+    if (progress > 100) progress = 100;
+    progressBar.style.width = `${progress}%`;
+    loadingDots.textContent = '.'.repeat(Math.floor((progress / 100) * 3));
+    if (progress >= 100) {
+      clearInterval(interval);
       setTimeout(() => {
-        dashboard.style.display = "none";
-        loginContainer.style.display = "flex";
-        form.reset();
-        generateCaptcha();
-        errorMessage.textContent = "";
-        loginBtn.disabled = false;
-        sessionTimeoutMsg.style.display = "block";
-        
-        // Reverse the transition
+        loadingScreen.classList.add('hide');
         setTimeout(() => {
-          pageTransition.style.transform = "scaleY(0)";
-          pageTransition.style.transformOrigin = "bottom";
-        }, 50);
-        
-        setTimeout(() => {
-          sessionTimeoutMsg.style.display = "none";
-        }, 5000);
-      }, 600);
+          loadingScreen.style.display = 'none';
+        }, 500);
+      }, 500);
     }
+  }, 100);
+});
 
-    window.onload = function () {
-      generateCaptcha();
-      if (localStorage.getItem("isLoggedIn") === "true") {
+const form = document.getElementById("login-form");
+const errorMessage = document.getElementById("login-error");
+const loadingContainer = document.getElementById("loading-container");
+const loginContainer = document.getElementById("login-container");
+const dashboard = document.getElementById("dashboard");
+const logoutBtn = document.getElementById("logout-btn");
+const loginBtn = document.getElementById("login-button");
+const captchaQuestionEl = document.getElementById("captcha-question");
+const captchaInput = document.getElementById("captcha-input");
+const togglePasswordBtn = document.getElementById("toggle-password-btn");
+const usernameInput = document.getElementById("username");
+const passwordInput = document.getElementById("password");
+const pageTransition = document.getElementById("pageTransition");
+
+const salt = "x@168AND365";
+const storedHash = "4bbef81ef369d37746faf9aed65e0219375796825bab86e781830da321e1d3cc";
+const MAX_ATTEMPTS = 5;
+let attempts = 0;
+
+// Session timeout redirect URL — ganti sesuai halaman timeout kamu
+const sessionTimeoutURL = "https://abang-cs.github.io/gambarbola/"; // Contoh: "session-timeout.html"
+
+const SESSION_TIMEOUT_MINUTES = 10; // timeout sesi dalam menit
+let idleSeconds = 0;
+
+function startIdleMonitor() {
+  idleSeconds = 0;
+
+  setInterval(() => {
+    if (localStorage.getItem("isLoggedIn") !== "true") return;
+
+    idleSeconds++;
+
+    if (idleSeconds >= SESSION_TIMEOUT_MINUTES * 1) {
+      redirectDueSessionTimeout();
+    }
+  }, 1000);
+}
+
+function resetIdleTimer() {
+  idleSeconds = 0;
+}
+
+function monitorUserActivity() {
+  ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll'].forEach(evt =>
+    document.addEventListener(evt, resetIdleTimer, { passive: true })
+  );
+}
+
+function redirectDueSessionTimeout() {
+  localStorage.removeItem("isLoggedIn");
+  attempts = 0;
+
+  // Jika kamu ingin animasi transisi bisa ditambahin di sini,
+  // tapi langsung redirect ke halaman timeout:
+  window.location.href = sessionTimeoutURL;
+}
+
+async function hashWithSalt(data, salt) {
+  const encoder = new TextEncoder();
+  const input = encoder.encode(data + salt);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", input);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+function generateCaptcha() {
+  let captchaAnswer = "";
+  for (let i = 0; i < 4; i++) {
+    captchaAnswer += Math.floor(Math.random() * 10);
+  }
+  captchaQuestionEl.textContent = "Captcha: " + captchaAnswer;
+  captchaInput.value = "";
+  return captchaAnswer;
+}
+
+let captchaAnswer = "";
+
+togglePasswordBtn.addEventListener("click", () => {
+  const isHidden = passwordInput.type === "password";
+  passwordInput.type = isHidden ? "text" : "password";
+  togglePasswordBtn.textContent = isHidden ? "🙈 Sembunyikan Password" : "👁️ Lihat Password";
+});
+
+form.addEventListener("submit", async function (e) {
+  e.preventDefault();
+  errorMessage.textContent = "";
+  const username = usernameInput.value.trim();
+  const password = passwordInput.value.trim();
+  const captchaValue = captchaInput.value.trim();
+
+  if (username.length < 4 || password.length < 6) {
+    errorMessage.textContent = "Username dan password minimal harus sesuai.";
+    return;
+  }
+  if (captchaValue !== captchaAnswer) {
+    errorMessage.textContent = "Captcha salah, coba lagi.";
+    captchaAnswer = generateCaptcha();
+    return;
+  }
+
+  if (attempts >= MAX_ATTEMPTS) {
+    errorMessage.textContent = "Anda sudah 5x gagal login. Tunggu 1 menit.";
+    loginBtn.disabled = true;
+    setTimeout(() => {
+      attempts = 0;
+      loginBtn.disabled = false;
+      errorMessage.textContent = "";
+      captchaAnswer = generateCaptcha();
+    }, 60000);
+    return;
+  }
+
+  loadingContainer.style.display = "flex";
+  loginBtn.disabled = true;
+
+  const combined = username + ":" + password;
+  const inputHash = await hashWithSalt(combined, salt);
+
+  setTimeout(() => {
+    if (inputHash === storedHash) {
+      pageTransition.style.transform = "scaleY(1)";
+      pageTransition.style.transformOrigin = "bottom";
+
+      setTimeout(() => {
+        localStorage.setItem("isLoggedIn", "true");
         loginContainer.style.display = "none";
         dashboard.style.display = "flex";
-        resetSessionTimer();
-      }
-    };
-
-    togglePasswordBtn.addEventListener("click", () => {
-      const isHidden = passwordInput.type === "password";
-      passwordInput.type = isHidden ? "text" : "password";
-      togglePasswordBtn.textContent = isHidden ? "🙈 Sembunyikan Password" : "👁️ Lihat Password";
-    });
-
-    form.addEventListener("submit", async function (e) {
-      e.preventDefault();
-      errorMessage.textContent = "";
-      const username = usernameInput.value.trim();
-      const password = passwordInput.value.trim();
-      const captchaValue = captchaInput.value.trim();
-
-      if (username.length < 4 || password.length < 6) {
-        errorMessage.textContent = "Username dan password minimal harus sesuai.";
-        return;
-      }
-      if (captchaValue !== captchaAnswer) {
-        errorMessage.textContent = "Captcha salah, coba lagi.";
-        generateCaptcha();
-        return;
-      }
-
-      if (attempts >= MAX_ATTEMPTS) {
-        errorMessage.textContent = "Anda sudah 5x gagal login. Tunggu 1 menit.";
-        loginBtn.disabled = true;
-        setTimeout(() => {
-          attempts = 0;
-          loginBtn.disabled = false;
-          errorMessage.textContent = "";
-          generateCaptcha();
-        }, 60000);
-        return;
-      }
-
-      loadingContainer.style.display = "flex";
-      loginBtn.disabled = true;
-
-      const combined = username + ":" + password;
-      const inputHash = await hashWithSalt(combined, salt);
-
-      setTimeout(() => {
-        if (inputHash === storedHash) {
-          // Add page transition effect
-          pageTransition.style.transform = "scaleY(1)";
-          pageTransition.style.transformOrigin = "bottom";
-          
-          setTimeout(() => {
-            localStorage.setItem("isLoggedIn", "true");
-            loginContainer.style.display = "none";
-            dashboard.style.display = "flex";
-            resetSessionTimer();
-            attempts = 0;
-            form.reset();
-            generateCaptcha();
-            
-            // Reverse the transition
-            setTimeout(() => {
-              pageTransition.style.transform = "scaleY(0)";
-              pageTransition.style.transformOrigin = "top";
-            }, 50);
-          }, 600);
-        } else {
-          attempts++;
-          errorMessage.textContent = `Username atau password salah. Percobaan ke-${attempts} dari ${MAX_ATTEMPTS}.`;
-          generateCaptcha();
-          
-          // Shake animation for error
-          loginContainer.style.animation = "shake 0.5s";
-          setTimeout(() => {
-            loginContainer.style.animation = "";
-          }, 500);
-        }
-        loadingContainer.style.display = "none";
-        loginBtn.disabled = false;
-      }, 1500);
-    });
-
-    logoutBtn.addEventListener("click", () => {
-      // Add page transition effect
-      pageTransition.style.transform = "scaleY(1)";
-      pageTransition.style.transformOrigin = "top";
-      
-      setTimeout(() => {
-        localStorage.removeItem("isLoggedIn");
-        dashboard.style.display = "none";
-        loginContainer.style.display = "flex";
-        form.reset();
-        errorMessage.textContent = "";
-        clearTimeout(sessionTimer);
-        clearTimeout(sessionWarningTimer);
         attempts = 0;
-        generateCaptcha();
-        loginBtn.disabled = false;
-        
-        // Reverse the transition
+        form.reset();
+        captchaAnswer = generateCaptcha();
+        startIdleMonitor();
+        monitorUserActivity();
+
         setTimeout(() => {
           pageTransition.style.transform = "scaleY(0)";
-          pageTransition.style.transformOrigin = "bottom";
+          pageTransition.style.transformOrigin = "top";
         }, 50);
       }, 600);
-    });
-
-    function userActivity() {
-      if (localStorage.getItem("isLoggedIn") === "true") resetSessionTimer();
+    } else {
+      attempts++;
+      errorMessage.textContent = `Username atau password salah. Percobaan ke-${attempts} dari ${MAX_ATTEMPTS}.`;
+      captchaAnswer = generateCaptcha();
+      loginContainer.style.animation = "shake 0.5s";
+      setTimeout(() => {
+        loginContainer.style.animation = "";
+      }, 500);
     }
-    document.addEventListener("mousemove", userActivity);
-    document.addEventListener("keypress", userActivity);
+    loadingContainer.style.display = "none";
+    loginBtn.disabled = false;
+  }, 1500);
+});
 
-    const trail = document.getElementById("trail");
-    document.addEventListener("mousemove", (e) => {
-      trail.style.left = e.pageX + "px";
-      trail.style.top = e.pageY + "px";
-    });
-    
-    // Buka semua link dengan class "popup-link" di jendela baru (popup window)
-    document.querySelectorAll('.popup-link').forEach(link => {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        window.open(this.href, '_blank', 'width=1000,height=700,scrollbars=yes,resizable=yes');
-      });
-    });
+logoutBtn.addEventListener("click", () => {
+  pageTransition.style.transform = "scaleY(1)";
+  pageTransition.style.transformOrigin = "top";
 
-    // Add shake animation for errors
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-        20%, 40%, 60%, 80% { transform: translateX(5px); }
-      }
-    `;
-    document.head.appendChild(style);
-  </script>
+  setTimeout(() => {
+    localStorage.removeItem("isLoggedIn");
+    dashboard.style.display = "none";
+    loginContainer.style.display = "flex";
+    form.reset();
+    errorMessage.textContent = "";
+    attempts = 0;
+    captchaAnswer = generateCaptcha();
+    loginBtn.disabled = false;
+
+    setTimeout(() => {
+      pageTransition.style.transform = "scaleY(0)";
+      pageTransition.style.transformOrigin = "bottom";
+    }, 50);
+  }, 600);
+});
+
+// Mouse Trail
+const trail = document.getElementById("trail");
+document.addEventListener("mousemove", (e) => {
+  trail.style.left = e.pageX + "px";
+  trail.style.top = e.pageY + "px";
+});
+
+// Buka semua link sebagai popup
+document.querySelectorAll('.popup-link').forEach(link => {
+  link.addEventListener('click', function (e) {
+    e.preventDefault();
+    window.open(this.href, '_blank', 'width=1000,height=700,scrollbars=yes,resizable=yes');
+  });
+});
+
+// Tambahkan animasi shake
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+    20%, 40%, 60%, 80% { transform: translateX(10px); }
+  }
+`;
+document.head.appendChild(style);
+
+// On page load
+window.onload = () => {
+  captchaAnswer = generateCaptcha();
+  if (localStorage.getItem("isLoggedIn") === "true") {
+    loginContainer.style.display = "none";
+    dashboard.style.display = "flex";
+    startIdleMonitor();
+    monitorUserActivity();
+  }
+};
+
+</script>
 </body>
 </html>
-
