@@ -237,7 +237,7 @@ let attempts = 0;
 // Session timeout redirect URL — ganti sesuai halaman timeout kamu
 const sessionTimeoutURL = "https://abang-cs.github.io/gambarbola/"; // Contoh: "session-timeout.html"
 
-const SESSION_TIMEOUT_MINUTES = 10; // timeout sesi dalam menit
+const SESSION_TIMEOUT_MINUTES = 10; 
 let idleSeconds = 0;
 
 function startIdleMonitor() {
@@ -248,7 +248,7 @@ function startIdleMonitor() {
 
     idleSeconds++;
 
-    if (idleSeconds >= SESSION_TIMEOUT_MINUTES * 1) {
+    if (idleSeconds >= SESSION_TIMEOUT_MINUTES * 60) {
       redirectDueSessionTimeout();
     }
   }, 1000);
