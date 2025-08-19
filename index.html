@@ -248,7 +248,7 @@ function startIdleMonitor() {
 
     idleSeconds++;
 
-    if (idleSeconds >= SESSION_TIMEOUT_MINUTES * 60) {
+    if (idleSeconds >= SESSION_TIMEOUT_MINUTES * 10) {
       redirectDueSessionTimeout();
     }
   }, 1000);
